@@ -23,6 +23,70 @@ Ce guide explique comment démarrer l’ensemble des services de l’application
 
 ---
 
+## 📁 Fichiers de configuration
+
+> ⚠️ Par défaut, les fichiers de configuration doivent se trouver dans le dossier `./config`.
+> Si vous souhaitez les placer ailleurs, il faudra adapter les chemins dans `docker-compose.yml` ou les variables d’environnement correspondantes.
+
+---
+
+### 1️⃣ `config.json`
+
+Ce fichier contient la configuration Firebase et l’URL de l’API pour le développement local.
+
+#### Étapes pour récupérer `firebaseConfig`
+
+1. Connectez-vous à **Firebase**.
+2. Aller dans **Paramètres → Paramètres généraux**.
+3. Si nécessaire, **ajouter une application**.
+4. Copier le contenu de la variable `firebaseConfig`.
+
+#### Exemple de contenu
+
+```json
+{
+  "EDHA": {
+    "label": "Développement Local",
+    "firebaseOptions": {
+      // coller ici les données récupérées de firebaseConfig
+    },
+    "apiBaseUrl": "http://localhost:9091/"
+  }
+}
+```
+
+---
+
+### 2️⃣ `apiKey.json`
+
+Ce fichier contient la clé d’API complète pour Firebase ou un service similaire.
+
+#### Exemple de structure
+
+```json
+{
+  "type": "",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "",
+  "token_uri": "",
+  "auth_provider_x509_cert_url": "",
+  "client_x509_cert_url": "",
+  "universe_domain": ""
+}
+```
+
+#### Étapes pour remplir ce fichier
+
+1. Générer ou télécharger la **clé de service** depuis Firebase :
+   **Paramètres → Comptes de service → Générer une clé**.
+2. Copier le contenu JSON fourni par Firebase directement dans `apiKey.json`.
+
+---
+
 ## 🌐 Services exposés (ports par défaut)
 
 | Service     | URL / Port                                     |
