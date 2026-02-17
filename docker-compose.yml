@@ -1,86 +1,85 @@
-  services:
-    mysql:
-      image: mysql:latest
-      container_name: mysql
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpassword
-        MYSQL_DATABASE: olga
-      ports:
-        - "3306:3306"
-      volumes:
-        - mysql_data:/var/lib/mysql
-      restart: always
-      networks:
-        - olga
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    env_file:
+      - .env.mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    networks:
+      - olga
 
-    phpmyadmin:
-      image: phpmyadmin/phpmyadmin:latest
-      container_name: phpmyadmin
-      ports:
-        - "81:80"
-      environment:
-        PMA_HOST: mysql
-        PMA_USER: myuser
-        PMA_PASSWORD: mypassword
-      depends_on:
-        - mysql
-      restart: always
-      links:
-        - mysql
-      networks:
-        - olga
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "81:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: myuser
+      PMA_PASSWORD: mypassword
+    depends_on:
+      - mysql
+    restart: always
+    links:
+      - mysql
+    networks:
+      - olga
 
-    api:
-      image: kirito140/olga-backend:latest
-      container_name: api
-      ports:
-        - "9091:9091"
-      env_file:
-        - .env.back
-      depends_on:
-        - mysql
-      volumes:
-        - ./config/apiKey.json:/app/config/apiKey.json:ro
-      links:
-        - mysql
-      networks:
-        - olga
+  api:
+    image: kirito140/olga-backend:latest
+    container_name: api
+    ports:
+      - "9091:9091"
+    env_file:
+      - .env.back
+    depends_on:
+      - mysql
+    volumes:
+      - ./config/apiKey.json:/app/config/apiKey.json:ro
+    links:
+      - mysql
+    networks:
+      - olga
 
-    designer:
-      build:
-        context: .
-        dockerfile: Dockerfile.designer
-      container_name: designer
-      ports:
-        - "8080:80"
-      env_file:
-        - .env.front
-      volumes:
-        - ./config/config.json:/usr/share/nginx/html/config/config.json:ro
-      depends_on:
-        - api
-      networks:
-        - olga
+  designer:
+    build:
+      context: .
+      dockerfile: Dockerfile.designer
+    container_name: designer
+    ports:
+      - "8080:80"
+    env_file:
+      - .env.front
+    volumes:
+      - ./config/config.json:/usr/share/nginx/html/config/config.json:ro
+    depends_on:
+      - api
+    networks:
+      - olga
 
-    admin:
-      build:
-        context: .
-        dockerfile: Dockerfile.admin
-      container_name: admin
-      ports:
-        - "8081:80"
-      env_file:
-        - .env.front
-      volumes:
-        - ./config/config.json:/usr/share/nginx/html/config/config.json:ro
-      depends_on:
-        - api
-      networks:
-        - olga
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: admin
+    ports:
+      - "8081:80"
+    env_file:
+      - .env.front
+    volumes:
+      - ./config/config.json:/usr/share/nginx/html/config/config.json:ro
+    depends_on:
+      - api
+    networks:
+      - olga
 
-  networks:
-    olga:
-      driver: bridge
+networks:
+  olga:
+    driver: bridge
 
-  volumes:
-    mysql_data:
+volumes:
+  mysql_data:

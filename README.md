@@ -9,12 +9,12 @@ Ce guide explique comment démarrer l’ensemble des services de l’application
 ## ✅ Prérequis
 
 * **Docker** installé et en cours d’exécution
-* **Docker Compose v2** (commande `docker compose`)
+* **Docker Compose v2** (`docker compose`)
   *(ou `docker-compose` si version plus ancienne)*
 
 ---
 
-## 📁 Fichiers principaux du projet
+## 📁 Structure du projet
 
 * `docker-compose.yml`
 * `Dockerfile.admin`
@@ -23,32 +23,32 @@ Ce guide explique comment démarrer l’ensemble des services de l’application
 
 ---
 
-## 📁 Fichiers de configuration
+## ⚙️ Configuration des fichiers
 
-> ⚠️ Par défaut, les fichiers de configuration doivent se trouver dans le dossier `./config`.
-> Si vous souhaitez les placer ailleurs, il faudra adapter les chemins dans `docker-compose.yml` ou les variables d’environnement correspondantes.
+> ⚠️ Par défaut, les fichiers doivent être placés dans `./config`.
+> Si vous les placez ailleurs, adaptez les chemins dans `docker-compose.yml` ou les variables d’environnement.
 
 ---
 
-### 1️⃣ `config.json`
+### 1. config.json
 
-Ce fichier contient la configuration Firebase et l’URL de l’API pour le développement local.
+Contient la configuration Firebase et l’URL de l’API pour le développement local.
 
-#### Étapes pour récupérer `firebaseConfig`
+#### 🔹 Récupérer firebaseConfig
 
-1. Connectez-vous à **Firebase**.
-2. Aller dans **Paramètres → Paramètres généraux**.
-3. Si nécessaire, **ajouter une application**.
-4. Copier le contenu de la variable `firebaseConfig`.
+1. Se connecter à **Firebase**
+2. Aller dans **Paramètres → Paramètres généraux**
+3. Ajouter une application si nécessaire
+4. Copier le contenu de la variable `firebaseConfig`
 
-#### Exemple de contenu
+#### 🔹 Exemple
 
 ```json
 {
   "EDHA": {
     "label": "Développement Local",
     "firebaseOptions": {
-      // coller ici les données récupérées de firebaseConfig
+      // coller ici les données firebaseConfig
     },
     "apiBaseUrl": "http://localhost:9091/"
   }
@@ -57,11 +57,11 @@ Ce fichier contient la configuration Firebase et l’URL de l’API pour le dév
 
 ---
 
-### 2️⃣ `apiKey.json`
+### 2. apiKey.json
 
-Ce fichier contient la clé d’API complète pour Firebase ou un service similaire.
+Contient la clé de service Firebase (backend uniquement).
 
-#### Exemple de structure
+#### 🔹 Structure attendue
 
 ```json
 {
@@ -79,38 +79,92 @@ Ce fichier contient la clé d’API complète pour Firebase ou un service simila
 }
 ```
 
-#### Étapes pour remplir ce fichier
+#### 🔹 Génération
 
-1. Générer ou télécharger la **clé de service** depuis Firebase :
-   **Paramètres → Comptes de service → Générer une clé**.
-2. Copier le contenu JSON fourni par Firebase directement dans `apiKey.json`.
+1. Firebase → **Paramètres → Comptes de service**
+2. Cliquer sur **Générer une clé privée**
+3. Copier le JSON téléchargé dans `apiKey.json`
 
 ---
 
-## 🌐 Services exposés (ports par défaut)
+### 3. .env.mysql
+
+Variables d’environnement du service MySQL.
+
+```env
+MYSQL_ROOT_PASSWORD=<ROOT_PASSWORD>
+MYSQL_USER=<USERNAME>
+MYSQL_PASSWORD=<USER_PASSWORD>
+MYSQL_DATABASE=olga
+```
+
+| Variable            | Description              |
+| ------------------- | ------------------------ |
+| MYSQL_ROOT_PASSWORD | Mot de passe root MySQL  |
+| MYSQL_DATABASE      | Nom de la base créée     |
+| MYSQL_USER          | Utilisateur applicatif   |
+| MYSQL_PASSWORD      | Mot de passe utilisateur |
+
+---
+
+### 4. .env.back
+
+Variables d’environnement du Backend.
+
+```env
+ADDRESS=0.0.0.0
+PORT=9091
+MYSQL_URL=jdbc:mysql://mysql:3306/olga
+MYSQL_USERNAME=<USERNAME>
+MYSQL_PASSWORD=<USER_PASSWORD>
+FIREBASE_KEY_PATH=/app/config/apiKey.json
+```
+
+| Variable          | Description                               |
+| ----------------- | ----------------------------------------- |
+| ADDRESS           | Adresse d’écoute du serveur               |
+| PORT              | Port du backend                           |
+| MYSQL_URL         | URL JDBC MySQL                            |
+| MYSQL_USERNAME    | Utilisateur MySQL                         |
+| MYSQL_PASSWORD    | Mot de passe MySQL                        |
+| FIREBASE_KEY_PATH | Chemin vers apiKey.json dans le conteneur |
+
+---
+
+### 5. .env.front
+
+Variables d’environnement des frontends.
+
+```env
+VITE_BACKEND_URL=http://localhost:9091
+```
+
+| Variable         | Description           |
+| ---------------- | --------------------- |
+| VITE_BACKEND_URL | URL publique de l’API |
+
+---
+
+## 🌐 Services exposés
 
 | Service     | URL / Port                                     |
 | ----------- | ---------------------------------------------- |
-| MySQL       | 3306 (à modifier)                              |
+| MySQL       | 3306                                           |
 | phpMyAdmin  | [http://localhost:81](http://localhost:81)     |
-| API Backend | [http://localhost:9091](http://localhost:9091) |
+| Backend API | [http://localhost:9091](http://localhost:9091) |
 | Designer    | [http://localhost:8080](http://localhost:8080) |
 | Admin       | [http://localhost:8081](http://localhost:8081) |
 
-Ces ports correspondent aux mappings définis dans `docker-compose.yml`.
-
 ---
 
-## 🚀 Démarrer tous les services
-
-## Windows / macOS / Linux
+## 🚀 Démarrer les services
 
 ```bash
 docker compose up -d --build
 ```
 
-✔ Construit les images si nécessaire
-✔ Démarre tous les services en arrière-plan
+* Construit les images si nécessaire
+* Démarre tous les services en arrière-plan
 
 ---
 
@@ -120,7 +174,7 @@ docker compose up -d --build
 docker compose down
 ```
 
-## Supprimer aussi les volumes (⚠ supprime la base de données)
+### Supprimer aussi les volumes (⚠ supprime la base)
 
 ```bash
 docker compose down -v
@@ -128,16 +182,9 @@ docker compose down -v
 
 ---
 
-## 🔄 Rebuild d’un seul service
+## 🔄 Rebuild d’un service spécifique
 
-## Exemple : Designer
-
-```bash
-docker compose build designer
-docker compose up -d designer
-```
-
-Ou en une seule commande :
+Exemple pour le service `designer` :
 
 ```bash
 docker compose up -d --build designer
@@ -147,81 +194,34 @@ docker compose up -d --build designer
 
 ## 📋 Logs & Debug
 
-## Voir les logs de tous les services
+### Voir tous les logs
 
 ```bash
 docker compose logs -f
 ```
 
-### Voir les logs d’un service spécifique
+### Logs d’un service spécifique
 
 ```bash
-docker compose logs -f api
+docker compose logs -f backend
 ```
 
-### Ouvrir un shell dans un conteneur
+### Ouvrir un shell dans le backend
 
 ```bash
-docker compose exec api sh
+docker compose exec backend sh
 ```
 
 ---
 
-## ⚙️ Fichiers de configuration importants
+## 📌 Fichiers importants
 
-| Fichier              | Rôle                              |
-| -------------------- | --------------------------------- |
-| `config/config.json` | Configuration des frontends       |
-| `config/apiKey.json` | Clé Firebase (backend uniquement) |
-| `.env.back`          | Variables d’environnement backend |
-| `.env.front`         | Variables d’environnement front   |
+| Fichier            | Rôle                    |
+| ------------------ | ----------------------- |
+| config/config.json | Configuration frontend  |
+| config/apiKey.json | Clé Firebase backend    |
+| .env.mysql         | Configuration MySQL     |
+| .env.back          | Configuration backend   |
+| .env.front         | Configuration frontends |
 
-⚠ **Vérifiez ces fichiers avant de démarrer les services.**
-
----
-
-## 🔍 Commandes utiles
-
-### Voir les conteneurs actifs
-
-```bash
-docker compose ps
-```
-
-### Nettoyage complet Docker (⚠ avancé)
-
-```bash
-docker system prune --all --volumes
-```
-
----
-
-## 🛠 Dépannage rapide
-
-* Consultez les logs :
-
-  ```bash
-  docker compose logs <service>
-  ```
-
-* Vérifiez que les ports ne sont pas déjà utilisés sur votre machine.
-
-* Pour réinitialiser la base de données :
-
-  ```bash
-  docker compose down -v
-  ```
-
----
-
-## 📌 Architecture simplifiée
-
-```txt
-Navigateur
-   ↓
-Frontend (8080 / 8081)
-   ↓
-API Backend (9091)
-   ↓
-MySQL (3306)
-```
+⚠ Vérifiez ces fichiers avant de lancer l’application
